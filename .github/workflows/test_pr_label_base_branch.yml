@@ -13,7 +13,7 @@ jobs:
     steps:
       - run: echo ${LABELS} | grep ${GITHUB_BASE_REF}
         env:
-          LABELS: ${{ github.event.pull_request.labels }}
+          LABELS: ${{ toJson(github.event.pull_request.labels) }}
         if: github.event.action == 'opened'
       - run: true
         if: github.event.action == 'labeled' && github.event.label.name == github.base_ref
