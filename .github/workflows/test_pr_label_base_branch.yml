@@ -4,6 +4,7 @@ on:
   pull_request:
     types:
       - opened
+      - synchronize
       - labeled
       - unlabeled
 
@@ -14,7 +15,7 @@ jobs:
       - run: echo ${LABELS} | grep ${GITHUB_BASE_REF}
         env:
           LABELS: ${{ toJson(github.event.pull_request.labels) }}
-        if: github.event.action == 'opened'
+        if: github.event.action == 'opened' || github.event.action == 'synchronize'
       - run: true
         if: github.event.action == 'labeled' && github.event.label.name == github.base_ref
       - run: false
