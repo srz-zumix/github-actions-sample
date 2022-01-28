@@ -1,18 +1,27 @@
-name: "Check base branch label"
+name: "Check"
 
 on:
   pull_request:
     types:
+      - opened
+      - synchronize
+      - edited # for change base
       - labeled
       - unlabeled
 
 jobs:
-  base_branch_cehck:
-    if: github.event.label.name == github.base_ref
+  base_branch_label_cehck:
     runs-on: ubuntu-latest
     steps:
+      - run: echo ${LABELS} | grep ${GITHUB_BASE_REF}
+        env:
+          LABELS: ${{ toJson(github.event.pull_request.labels) }}
+        if: >
+          github.event.action == 'opened' ||
+          github.event.action == 'synchronize' ||
+          github.event.action == 'edited'
       - run: true
-        if: github.event.action == 'labeled'
+        if: github.event.action == 'labeled' && github.event.label.name == github.base_ref
       - run: false
-        if: github.event.action == 'unlabeled'
+        if: github.event.action == 'unlabeled' && github.event.label.name == github.base_ref
 
