@@ -4,7 +4,6 @@ on:
   pull_request:
     types:
       - opened
-      - synchronize
       - edited # for change base
       - labeled
       - unlabeled
@@ -12,9 +11,6 @@ on:
 jobs:
   base_branch_label_cehck:
     runs-on: ubuntu-latest
-    if: >
-      github.event.action != 'edited' ||
-      github.event.changes.base
     steps:
       - run: echo ${LABELS} | grep ${GITHUB_BASE_REF}
         env:
