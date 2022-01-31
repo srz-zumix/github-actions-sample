@@ -12,7 +12,11 @@ jobs:
   base_branch_label_cehck:
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${LABELS} | grep ${GITHUB_BASE_REF}
-        env:
-          LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+      # - run: echo ${LABELS} | grep ${GITHUB_BASE_REF}
+      #   env:
+      #     LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+      - run: true
+        if:   contains(github.event.pull_request.labels.*.name, github.base_ref)
+      - run: false
+        if: ! contains(github.event.pull_request.labels.*.name, github.base_ref)
 
