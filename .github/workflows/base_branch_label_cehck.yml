@@ -18,7 +18,4 @@ jobs:
       - run: true
         if: >
            contains(github.event.pull_request.labels.*.name, github.base_ref)
-      - run: false
-        if: >
-          ! contains(github.event.pull_request.labels.*.name, github.base_ref)
 
