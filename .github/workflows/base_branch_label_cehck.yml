@@ -15,10 +15,8 @@ jobs:
       # - run: echo ${LABELS} | grep ${GITHUB_BASE_REF}
       #   env:
       #     LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
-      # - run: true
-      #   if: >
-      #      contains(github.event.pull_request.labels.*.name, github.base_ref)
+      - run: true
+        if: "  contains(github.event.pull_request.labels.*.name, github.base_ref)"
       - run: false
-        if: >
-          ! contains(github.event.pull_request.labels.*.name, github.base_ref)
+        if: "! contains(github.event.pull_request.labels.*.name, github.base_ref)"
 
