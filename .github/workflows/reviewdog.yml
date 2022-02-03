@@ -30,8 +30,14 @@ jobs:
       # git diff をするためにターゲットブランチをフェッチする必要がある
       - name: 'Fetch'
         run: git fetch --depth 1 origin ${TARGET_BRANCH}
+      # サービスの Jenkins が起動するのを待つ
+      - name: Wait Launch Jenkins
+        run: |
+          docker cp "${{ job.services.jenkins.id }}":/home/wait-jenkins-launch.sh ./wait-jenkins-launch.sh
+          ./wait-jenkins-launch.sh "${{ job.services.jenkins.id }}"
+          docker logs "${{ job.services.jenkins.id }}"
       - name: lint
-        # shell: bash -e -o pipefail {0}
+        shell: bash -e -o pipefail {0}
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
