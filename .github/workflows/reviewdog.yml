@@ -45,13 +45,16 @@ jobs:
           done
           docker logs "${{ job.services.jenkins.id }}"
       # Jenkins のプラグインインストール
-      - name: Install Jenkins Plugins
-        run: |
-          docker cp ./JenkinsPlugins.txt "${{ job.services.jenkins.id }}":/home/JenkinsPlugins.txt
-          docker exec "${{ job.services.jenkins.id }}" jenkins-plugin-cli --verbose --plugin-file /home/JenkinsPlugins.txt
-      - name: Restart Jenkins
+      - name: Download CLI
         run: |
           wget ${JENKINS_URL}/jnlpJars/jenkins-cli.jar
+      - name: Install Jenkins Plugins
+        run: |
+          cat JenkinsPlugins.txt | xargs -I{} java -jar jenkins-cli.jar -s "${JENKINS_URL}" install-plugin {}
+          # docker cp ./JenkinsPlugins.txt "${{ job.services.jenkins.id }}":/home/JenkinsPlugins.txt
+          # docker exec "${{ job.services.jenkins.id }}" jenkins-plugin-cli --verbose --plugin-file /home/JenkinsPlugins.txt
+      - name: Restart Jenkins
+        run: |
           java -jar jenkins-cli.jar -s "${JENKINS_URL}" restart
           sleep 600
           docker logs "${{ job.services.jenkins.id }}"
