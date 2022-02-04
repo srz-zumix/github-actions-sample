@@ -49,10 +49,10 @@ jobs:
         run: |
           docker cp ./JenkinsPlugins.txt "${{ job.services.jenkins.id }}":/home/JenkinsPlugins.txt
           docker exec "${{ job.services.jenkins.id }}" jenkins-plugin-cli --verbose --plugin-file /home/JenkinsPlugins.txt
-      - name: Reload Jenkins
+      - name: Restart Jenkins
         run: |
           wget ${JENKINS_URL}/jnlpJars/jenkins-cli.jar
-          java -jar jenkins-cli.jar -s "${JENKINS_URL}" reload-configuration
+          java -jar jenkins-cli.jar -s "${JENKINS_URL}" restart
           sleep 600
           docker logs "${{ job.services.jenkins.id }}"
       - name: lint
