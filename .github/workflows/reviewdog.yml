@@ -17,6 +17,8 @@ jobs:
         credentials:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+        env:
+          JAVA_OPTS: -Djenkins.install.runSetupWizard=false
         ports:
           - 8080:8080
           - 50000:50000
