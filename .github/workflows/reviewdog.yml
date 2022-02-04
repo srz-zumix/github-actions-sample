@@ -29,6 +29,12 @@ jobs:
       TARGET_BRANCH: ${{ github.base_ref }}
     steps:
       - uses: actions/checkout@v2
+      # Jenkins のプラグインインストール
+      - name: Install Jenkins Plugins
+        run: |
+          docker cp ./JenkinsPlugins.txt "${{ job.services.jenkins.id }}":/home/JenkinsPlugins.txt
+          docker exec "${{ job.services.jenkins.id }}" jenkins-plugin-cli --verbose --plugin-file /home/JenkinsPlugins.txt
+          curl -X POST -u "${JENKINS_USER}:${JENKINS_PASSWORD}" "${JENKINS_URL}/restart"
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
@@ -44,11 +50,6 @@ jobs:
             sleep 30 | echo "waiting..."
           done
           docker logs "${{ job.services.jenkins.id }}"
-      # Jenkins のプラグインインストール
-      - name: Install Jenkins Plugins
-        run: |
-          docker cp ./JenkinsPlugins.txt "${{ job.services.jenkins.id }}":/home/JenkinsPlugins.txt
-          docker exec "${{ job.services.jenkins.id }}" jenkins-plugin-cli --verbose --plugin-file /home/JenkinsPlugins.txt
       - name: lint
         shell: bash -e -o pipefail {0}
         env:
