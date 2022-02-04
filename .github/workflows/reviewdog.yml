@@ -54,6 +54,7 @@ jobs:
           wget ${JENKINS_URL}/jnlpJars/jenkins-cli.jar
           java -jar jenkins-cli.jar -s "${JENKINS_URL}" reload-configuration
           sleep 600
+          docker logs "${{ job.services.jenkins.id }}"
       - name: lint
         shell: bash -e -o pipefail {0}
         env:
