@@ -38,8 +38,9 @@ jobs:
       # サービスの Jenkins が起動するのを待つ
       - name: Wait Launch Jenkins
         run: |
-          docker cp "${{ job.services.jenkins.id }}":/home/wait-jenkins-launch.sh ./wait-jenkins-launch.sh
-          ./wait-jenkins-launch.sh "${{ job.services.jenkins.id }}"
+          until docker logs "${{ job.services.jenkins.id }}" 2>&1 | grep "Jenkins is fully up and running"; do
+            sleep 30 | echo "waiting..."
+          done
           docker logs "${{ job.services.jenkins.id }}"
       - name: lint
         shell: bash -e -o pipefail {0}
