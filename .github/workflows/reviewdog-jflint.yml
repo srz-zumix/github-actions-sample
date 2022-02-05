@@ -121,14 +121,14 @@ jobs:
     runs-on: ubuntu-latest
     environment: jenkins
     outputs:
-      has: ${{ steps.check.outputs.has }}
+      has_secrets: ${{ steps.check.outputs.has }}
     steps:
       - name: Check secrets
         id: check
         env:
           JENKINS_URL: ${{ secrets.JENKINS_URL }}
         if: "${{ env.JENKINS_URL != "" }}"
-        run: echo "::set-output name=has::true"
+        run: echo "::set-output name=has_secrets::true"
 
   jflint:
     runs-on: ubuntu-latest
@@ -139,7 +139,7 @@ jobs:
       JENKINS_USER: ${{ secrets.JENKINS_USER }}
       JENKINS_TOKEN: ${{ secrets.JENKINS_TOKEN }}
       TARGET_BRANCH: ${{ github.base_ref }}
-    if: needs.jflint-check-secret.outputs.has == 'true'
+    if: needs.jflint-check-secret.outputs.has_secrets == 'true'
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
