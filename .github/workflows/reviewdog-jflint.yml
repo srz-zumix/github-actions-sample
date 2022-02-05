@@ -54,6 +54,9 @@ jobs:
           java -jar jenkins-cli.jar -s "${JENKINS_URL}" restart
       - name: Wait restart
         run: |
+          until java -jar jenkins-cli.jar -s "${JENKINS_URL}" session-id; do
+            sleep 30; echo "waiting..."
+          done
           while java -jar jenkins-cli.jar -s "${JENKINS_URL}" session-id | grep "${{ steps.session-id.outputs.before }}"; do
             sleep 30; echo "waiting..."
           done
