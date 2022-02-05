@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: jenkins
     outputs:
-      has: ${{ steps.check.outputs.has }}
+      has: "${{ steps.check.outputs.has }}"
     steps:
       - id: check
         env:
