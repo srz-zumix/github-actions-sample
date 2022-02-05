@@ -64,7 +64,7 @@ jobs:
         run: |
           for file in $(git diff origin/${TARGET_BRANCH} HEAD --diff-filter=AM --name-only -- "*Jenkinsfile") ; do
             echo "${file}"
-            npx jflint -p "${JENKINS_PASSWORD}" "${file}" 2>&1 \
+            npx jflint -j "${JENKINS_URL}" "${file}" 2>&1 \
               | sed -e "s|WorkflowScript:|${file}:|g" | tee -a log.txt
           done
           if [ -e log.txt ]; then
@@ -109,7 +109,7 @@ jobs:
         run: |
           for file in $(git diff origin/${TARGET_BRANCH} HEAD --diff-filter=AM --name-only -- "*Jenkinsfile") ; do
             echo "${file}"
-            npx jflint -p "${JENKINS_PASSWORD}" "${file}" 2>&1 \
+            npx jflint -j "${JENKINS_URL}" "${file}" 2>&1 \
               | sed -e "s|WorkflowScript:|${file}:|g" | tee -a log.txt
           done
           if [ -e log.txt ]; then
@@ -117,13 +117,29 @@ jobs:
             rm -f log.txt
           fi
 
+  jflint-check-secret:
+    runs-on: ubuntu-latest
+    environment: jenkins
+    outputs:
+      has: ${{ steps.check.outputs.has }}
+    steps:
+      - name: Check secrets
+        id: check
+        env:
+          JENKINS_URL: ${{ secrets.JENKINS_URL }}
+        if: "${{ env.JENKINS_URL != "" }}"
+        run: echo "::set-output name=has::true"
+
   jflint:
     runs-on: ubuntu-latest
+    needs: jflint-check-secret
     environment: jenkins
     env:
       JENKINS_URL: ${{ secrets.JENKINS_URL }}
+      JENKINS_USER: ${{ secrets.JENKINS_USER }}
+      JENKINS_TOKEN: ${{ secrets.JENKINS_TOKEN }}
       TARGET_BRANCH: ${{ github.base_ref }}
-    if: ${{ env.JENKINS_URL }} != ""
+    if: needs.jflint-check-secret.outputs.has == 'true'
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -141,7 +157,7 @@ jobs:
         run: |
           for file in $(git diff origin/${TARGET_BRANCH} HEAD --diff-filter=AM --name-only -- "*Jenkinsfile") ; do
             echo "${file}"
-            npx jflint -j "${JENKINS_URL}" -u "${{ secrets.JENKINS_USER }}" -p "${{ secrets.JENKINS_TOKEN }}" "${file}" 2>&1 \
+            npx jflint -j "${JENKINS_URL}" -u "${JENKINS_USER}" -p "${JENKINS_TOKEN}" "${file}" 2>&1 \
               | sed -e "s|WorkflowScript:|${file}:|g" | tee -a log.txt
           done
           if [ -e log.txt ]; then
