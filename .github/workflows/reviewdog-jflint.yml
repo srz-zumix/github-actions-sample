@@ -28,7 +28,6 @@ jobs:
         with:
           node-version: '14'
       - uses: reviewdog/action-setup@v1
-      - run: npm install
       # git diff をするためにターゲットブランチをフェッチする必要がある
       - name: 'Fetch'
         run: git fetch --depth 1 origin "${TARGET_BRANCH}"
