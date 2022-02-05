@@ -121,8 +121,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: jenkins
     env:
+      JENKINS_URL: ${{ secrets.JENKINS_URL }}
       TARGET_BRANCH: ${{ github.base_ref }}
-    if: ${{ secrets.JENKINS_URL }} != ""
+    if: ${{ env.JENKINS_URL }} != ""
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -140,7 +141,7 @@ jobs:
         run: |
           for file in $(git diff origin/${TARGET_BRANCH} HEAD --diff-filter=AM --name-only -- "*Jenkinsfile") ; do
             echo "${file}"
-            npx jflint -j "${secrets.JENKINS_URL}" -u "${secrets.JENKINS_USER}" -p "${{ secrets.JENKINS_TOKEN }}" "${file}" 2>&1 \
+            npx jflint -j "${JENKINS_URL}" -u "${{ secrets.JENKINS_USER }}" -p "${{ secrets.JENKINS_TOKEN }}" "${file}" 2>&1 \
               | sed -e "s|WorkflowScript:|${file}:|g" | tee -a log.txt
           done
           if [ -e log.txt ]; then
