@@ -3,6 +3,18 @@ on:
   pull_request:
 
 jobs:
+  jflint-check-secret:
+    runs-on: ubuntu-latest
+    environment: jenkins
+    outputs:
+      has: ${{ steps.check.outputs.has }}
+    steps:
+      - id: check
+        env:
+          JENKINS_URL: ${{ secrets.JENKINS_URL }}
+        if: "${{ env.JENKINS_URL != "" }}"
+        run: echo "::set-output name=has::true"
+
   jflint-official:
     runs-on: ubuntu-latest
     environment: dockerhub
@@ -116,18 +128,6 @@ jobs:
             cat log.txt | reviewdog -reporter=github-pr-review -name="jflint" -efm="%f: %l: %m"
             rm -f log.txt
           fi
-
-  jflint-check-secret:
-    runs-on: ubuntu-latest
-    environment: jenkins
-    outputs:
-      has: ${{ steps.check.outputs.has }}
-    steps:
-      - id: check
-        env:
-          JENKINS_URL: ${{ secrets.JENKINS_URL }}
-        if: "${{ env.JENKINS_URL != "" }}"
-        run: echo "::set-output name=has::true"
 
   jflint:
     runs-on: ubuntu-latest
