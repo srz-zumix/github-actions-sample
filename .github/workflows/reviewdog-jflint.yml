@@ -1,4 +1,4 @@
-name: reviewdog
+name: jflint
 on:
   pull_request:
 
