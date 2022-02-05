@@ -1,0 +1,150 @@
+name: reviewdog
+on:
+  pull_request:
+
+jobs:
+  jflint-official:
+    runs-on: ubuntu-latest
+    environment: dockerhub
+    services:
+      jenkins:
+        image: jenkins/jenkins:lts-jdk11
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+        env:
+          # セットアップウィザードを無効
+          # disable setup wizard
+          JAVA_OPTS: -Djenkins.install.runSetupWizard=false
+        ports:
+          - 8080:8080
+          - 50000:50000
+    env:
+      JENKINS_URL: http://localhost:8080
+      TARGET_BRANCH: ${{ github.base_ref }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - uses: reviewdog/action-setup@v1
+      - run: npm install
+      # git diff をするためにターゲットブランチをフェッチする必要がある
+      - name: 'Fetch'
+        run: git fetch --depth 1 origin ${TARGET_BRANCH}
+      - name: Wait Launch Jenkins
+        run: |
+          until docker logs "${{ job.services.jenkins.id }}" 2>&1 | grep "Jenkins is fully up and running"; do
+            sleep 30 | echo "waiting..."
+          done
+          docker logs "${{ job.services.jenkins.id }}"
+      - name: Download CLI
+        run: |
+          wget ${JENKINS_URL}/jnlpJars/jenkins-cli.jar
+      # オフィシャルイメージでセットアップウィザードを無効にするとプラグインがインストールされていないため、あとでインストールする
+      - name: Install Jenkins Plugins
+        run: |
+          cat JenkinsPlugins.txt | xargs -I{} java -jar jenkins-cli.jar -s "${JENKINS_URL}" install-plugin {}
+      - name: Get session-id
+        id: session-id
+        run: |
+          echo "##[set-output name=before;]$(java -jar jenkins-cli.jar -s "${JENKINS_URL}" session-id)"          
+      - name: Restart Jenkins
+        run: |
+          java -jar jenkins-cli.jar -s "${JENKINS_URL}" restart
+      - name: Wait restart
+        run: |
+          while java -jar jenkins-cli.jar -s "${JENKINS_URL}" session-id | grep "${{ steps.session-id.outputs.before }}"; do
+            sleep 30 | echo "waiting..."
+          done
+      - name: lint
+        shell: bash -e -o pipefail {0}
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for file in $(git diff origin/${TARGET_BRANCH} HEAD --diff-filter=AM --name-only -- "*Jenkinsfile") ; do
+            echo "${file}"
+            npx jflint -p "${JENKINS_PASSWORD}" "${file}" 2>&1 \
+              | sed -e "s|WorkflowScript:|${file}:|g" | tee -a log.txt
+          done
+          if [ -e log.txt ]; then
+            cat log.txt | reviewdog -reporter=github-pr-review -name="jflint" -efm="%f: %l: %m"
+            rm -f log.txt
+          fi
+
+  jflint-prebuilt:
+    runs-on: ubuntu-latest
+    services:
+      jenkins:
+        image: ghcr.io/srz-zumix/action-jenkins
+        credentials:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_PAT }}
+        image: jenkins/jenkins:lts-jdk11
+        ports:
+          - 8080:8080
+          - 50000:50000
+    env:
+      JENKINS_URL: http://localhost:8080
+      TARGET_BRANCH: ${{ github.base_ref }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - uses: reviewdog/action-setup@v1
+      - run: npm install
+      # git diff をするためにターゲットブランチをフェッチする必要がある
+      - name: 'Fetch'
+        run: git fetch --depth 1 origin ${TARGET_BRANCH}
+      - name: Wait Launch Jenkins
+        run: |
+          until docker logs "${{ job.services.jenkins.id }}" 2>&1 | grep "Jenkins is fully up and running"; do
+            sleep 30 | echo "waiting..."
+          done
+          docker logs "${{ job.services.jenkins.id }}"
+      - name: lint
+        shell: bash -e -o pipefail {0}
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for file in $(git diff origin/${TARGET_BRANCH} HEAD --diff-filter=AM --name-only -- "*Jenkinsfile") ; do
+            echo "${file}"
+            npx jflint -p "${JENKINS_PASSWORD}" "${file}" 2>&1 \
+              | sed -e "s|WorkflowScript:|${file}:|g" | tee -a log.txt
+          done
+          if [ -e log.txt ]; then
+            cat log.txt | reviewdog -reporter=github-pr-review -name="jflint" -efm="%f: %l: %m"
+            rm -f log.txt
+          fi
+
+  jflint:
+    runs-on: ubuntu-latest
+    environment: jenkins
+    env:
+      TARGET_BRANCH: ${{ github.base_ref }}
+    if: secrets.JENKINS_URL != ""
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - uses: reviewdog/action-setup@v1
+      - run: npm install
+      # git diff をするためにターゲットブランチをフェッチする必要がある
+      - name: 'Fetch'
+        run: git fetch --depth 1 origin ${TARGET_BRANCH}
+      - name: lint
+        shell: bash -e -o pipefail {0}
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for file in $(git diff origin/${TARGET_BRANCH} HEAD --diff-filter=AM --name-only -- "*Jenkinsfile") ; do
+            echo "${file}"
+            npx jflint -j "${secrets.JENKINS_URL}" -u "${secrets.JENKINS_USER}" -p "${{ secrets.JENKINS_TOKEN }}" "${file}" 2>&1 \
+              | sed -e "s|WorkflowScript:|${file}:|g" | tee -a log.txt
+          done
+          if [ -e log.txt ]; then
+            cat log.txt | reviewdog -reporter=github-pr-review -name="jflint" -efm="%f: %l: %m"
+            rm -f log.txt
+          fi
