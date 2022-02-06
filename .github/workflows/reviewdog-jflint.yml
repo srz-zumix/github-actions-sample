@@ -34,7 +34,7 @@ jobs:
       - uses: srz-zumix/setup-service-jenkins@main
         with:
           service_id: "${{ job.services.jenkins.id }}"
-          plugins_file: JenkinsPlugins.txt
+          install_suggested_plugins: true
       - name: lint
         shell: bash -e -o pipefail {0}
         env:
