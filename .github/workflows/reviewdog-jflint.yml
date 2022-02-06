@@ -31,34 +31,10 @@ jobs:
       # git diff をするためにターゲットブランチをフェッチする必要がある
       - name: 'Fetch'
         run: git fetch --depth 1 origin "${TARGET_BRANCH}"
-      - name: Wait Launch Jenkins
-        run: |
-          until docker logs "${{ job.services.jenkins.id }}" 2>&1 | grep "Jenkins is fully up and running"; do
-            sleep 30; echo "waiting..."
-          done
-          docker logs "${{ job.services.jenkins.id }}"
-      - name: Download CLI
-        run: |
-          wget "${JENKINS_URL}/jnlpJars/jenkins-cli.jar"
-      # オフィシャルイメージでセットアップウィザードを無効にするとプラグインがインストールされていないため、あとでインストールする
-      - name: Install Jenkins Plugins
-        run: |
-          xargs -I{} java -jar jenkins-cli.jar -s "${JENKINS_URL}" install-plugin {} < JenkinsPlugins.txt
-      - name: Get session-id
-        id: session-id
-        run: |
-          echo "##[set-output name=before;]$(java -jar jenkins-cli.jar -s "${JENKINS_URL}" session-id)"          
-      - name: Restart Jenkins
-        run: |
-          java -jar jenkins-cli.jar -s "${JENKINS_URL}" restart
-      - name: Wait restart
-        run: |
-          until java -jar jenkins-cli.jar -s "${JENKINS_URL}" session-id; do
-            sleep 30; echo "waiting..."
-          done
-          while java -jar jenkins-cli.jar -s "${JENKINS_URL}" session-id | grep "${{ steps.session-id.outputs.before }}"; do
-            sleep 30; echo "waiting..."
-          done
+      - uses: srz-zumix/setup-service-jenkins@main
+        with:
+          service_id: "${{ job.services.jenkins.id }}"
+          plugins_file: JenkinsPlugins.txt
       - name: lint
         shell: bash -e -o pipefail {0}
         env:
@@ -97,12 +73,9 @@ jobs:
       # git diff をするためにターゲットブランチをフェッチする必要がある
       - name: 'Fetch'
         run: git fetch --depth 1 origin "${TARGET_BRANCH}"
-      - name: Wait Launch Jenkins
-        run: |
-          until docker logs "${{ job.services.jenkins.id }}" 2>&1 | grep "Jenkins is fully up and running"; do
-            sleep 30; echo "waiting..."
-          done
-          docker logs "${{ job.services.jenkins.id }}"
+      - uses: srz-zumix/setup-service-jenkins@main
+        with:
+          service_id: "${{ job.services.jenkins.id }}"
       - name: lint
         shell: bash -e -o pipefail {0}
         env:
