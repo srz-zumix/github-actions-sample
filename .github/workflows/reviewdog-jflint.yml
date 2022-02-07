@@ -1,0 +1,140 @@
+name: jflint
+on:
+  pull_request:
+
+jobs:
+  jflint-official:
+    runs-on: ubuntu-latest
+    environment: dockerhub
+    services:
+      jenkins:
+        image: jenkins/jenkins:lts-jdk11
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+        env:
+          # セットアップウィザードを無効
+          # disable setup wizard
+          JAVA_OPTS: -Djenkins.install.runSetupWizard=false
+        ports:
+          - 8080:8080
+          - 50000:50000
+    env:
+      JENKINS_URL: http://localhost:8080
+      TARGET_BRANCH: ${{ github.base_ref }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - uses: reviewdog/action-setup@v1
+      # git diff をするためにターゲットブランチをフェッチする必要がある
+      - name: 'Fetch'
+        run: git fetch --depth 1 origin "${TARGET_BRANCH}"
+      - uses: srz-zumix/setup-service-jenkins@main
+        with:
+          service_id: "${{ job.services.jenkins.id }}"
+          # offical image をセットアップウィザードスキップで起動するとプラグインが空なのでインストールする
+          install_suggested_plugins: true
+      - name: jflint
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for file in $(git diff "origin/${TARGET_BRANCH}" HEAD --diff-filter=AM --name-only -- "*Jenkinsfile") ; do
+            echo "${file}"
+            npx jflint -j "${JENKINS_URL}" "${file}" 2>&1 \
+              | sed -e "s|WorkflowScript:|${file}:|g" | tee -a log.txt
+          done
+          if [ -e log.txt ]; then
+            reviewdog -reporter=github-pr-review -name="jflint" -efm="%f: %l: %m" < log.txt
+            rm -f log.txt
+          fi
+
+  jflint-prebuilt:
+    runs-on: ubuntu-latest
+    services:
+      jenkins:
+        image: ghcr.io/srz-zumix/action-jenkins
+        credentials:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_PAT }}
+        ports:
+          - 8080:8080
+          - 50000:50000
+    env:
+      JENKINS_URL: http://localhost:8080
+      TARGET_BRANCH: ${{ github.base_ref }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - uses: reviewdog/action-setup@v1
+      # git diff をするためにターゲットブランチをフェッチする必要がある
+      - name: 'Fetch'
+        run: git fetch --depth 1 origin "${TARGET_BRANCH}"
+      - uses: srz-zumix/setup-service-jenkins@main
+        with:
+          service_id: "${{ job.services.jenkins.id }}"
+      - name: jflint
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for file in $(git diff "origin/${TARGET_BRANCH}" HEAD --diff-filter=AM --name-only -- "*Jenkinsfile") ; do
+            echo "${file}"
+            npx jflint -j "${JENKINS_URL}" "${file}" 2>&1 \
+              | sed -e "s|WorkflowScript:|${file}:|g" | tee -a log.txt
+          done
+          if [ -e log.txt ]; then
+            reviewdog -reporter=github-pr-review -name="jflint" -efm="%f: %l: %m" < log.txt
+            rm -f log.txt
+          fi
+
+  jflint-check-secret:
+    runs-on: ubuntu-latest
+    environment: jenkins
+    env:
+      JENKINS_URL: ${{ secrets.JENKINS_URL }}
+    outputs:
+      has: "${{ steps.check.outputs.has }}"
+    steps:
+      - id: check
+        env:
+          JENKINS_URL: ${{ secrets.JENKINS_URL }}
+        if: "${{ env.JENKINS_URL != '' }}"
+        run: echo "::set-output name=has::true"
+
+  jflint:
+    runs-on: ubuntu-latest
+    needs: jflint-check-secret
+    environment: jenkins
+    env:
+      JENKINS_URL: ${{ secrets.JENKINS_URL }}
+      JENKINS_USER: ${{ secrets.JENKINS_USER }}
+      JENKINS_TOKEN: ${{ secrets.JENKINS_TOKEN }}
+      TARGET_BRANCH: ${{ github.base_ref }}
+    if: needs.jflint-check-secret.outputs.has == 'true'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - uses: reviewdog/action-setup@v1
+      # git diff をするためにターゲットブランチをフェッチする必要がある
+      - name: 'Fetch'
+        run: git fetch --depth 1 origin "${TARGET_BRANCH}"
+      - name: jflint
+        # jflint が error を返すので pipefail しない（本当はしたい）
+        # shell: bash -e -o pipefail {0}
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for file in $(git diff "origin/${TARGET_BRANCH}" HEAD --diff-filter=AM --name-only -- "*Jenkinsfile") ; do
+            echo "${file}"
+            npx jflint -j "${JENKINS_URL}" -u "${JENKINS_USER}" -p "${JENKINS_TOKEN}" "${file}" 2>&1 \
+              | sed -e "s|WorkflowScript:|${file}:|g" | tee -a log.txt
+          done
+          if [ -e log.txt ]; then
+            reviewdog -reporter=github-pr-review -name="jflint" -efm="%f: %l: %m" < log.txt
+            rm -f log.txt
+          fi
