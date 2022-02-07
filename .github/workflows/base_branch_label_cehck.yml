@@ -5,6 +5,7 @@ on:
     types:
       - opened
       - edited # for change base
+      - synchronize
       - labeled
       - unlabeled
 
