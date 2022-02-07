@@ -45,7 +45,7 @@ jobs:
               | sed -e "s|WorkflowScript:|${file}:|g" | tee -a log.txt
           done
           if [ -e log.txt ]; then
-            reviewdog -reporter=github-pr-review -name="jflint" -efm="%f: %l: %m" -tee < log.txt
+            reviewdog -reporter=github-pr-review -name="jflint" -efm="%f: %l: %m" < log.txt
             rm -f log.txt
           fi
 
