@@ -37,7 +37,7 @@ jobs:
         run: git fetch --depth 1 origin "${TARGET_BRANCH}"
       - uses: srz-zumix/setup-service-jenkins@main
         with:
-          service_id: "${{ job.services.jenkins.id }}"
+          id: "${{ job.services.jenkins.id }}"
           # offical image をセットアップウィザードスキップで起動するとプラグインが空なのでインストールする
           install_suggested_plugins: true
       - name: jflint
@@ -79,7 +79,7 @@ jobs:
         run: git fetch --depth 1 origin "${TARGET_BRANCH}"
       - uses: srz-zumix/setup-service-jenkins@main
         with:
-          service_id: "${{ job.services.jenkins.id }}"
+          id: "${{ job.services.jenkins.id }}"
       - name: jflint
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
