@@ -1,6 +1,10 @@
 name: jflint
 on:
   pull_request:
+    paths:
+      - '**/*Jenkinsfile'
+      - '.github/workflows/reviewdog-jflint.yml'
+
 
 jobs:
   jflint-official:

@@ -1,12 +1,4 @@
 #!/usr/bin/env groovy
-/**
- * Jenkinsfile
- *
- * Copyright (C) 2017, Takazumi Shirayanagi
- * This software is released under the new BSD License,
- * see LICENSE
-*/
-
 def checkoutSCM() {
     try {
         checkout scm
