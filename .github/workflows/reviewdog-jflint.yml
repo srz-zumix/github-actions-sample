@@ -35,7 +35,7 @@ jobs:
         with:
           service_id: "${{ job.services.jenkins.id }}"
           install_suggested_plugins: true
-      - name: lint
+      - name: jflint
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -45,7 +45,7 @@ jobs:
               | sed -e "s|WorkflowScript:|${file}:|g" | tee -a log.txt
           done
           if [ -e log.txt ]; then
-            reviewdog -reporter=github-pr-review -name="jflint" -efm="%f: %l: %m" < log.txt
+            reviewdog -reporter=github-pr-review -name="jflint" -efm="%f: %l: %m" -tee < log.txt
             rm -f log.txt
           fi
 
@@ -75,7 +75,7 @@ jobs:
       - uses: srz-zumix/setup-service-jenkins@main
         with:
           service_id: "${{ job.services.jenkins.id }}"
-      - name: lint
+      - name: jflint
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -122,7 +122,7 @@ jobs:
       # git diff をするためにターゲットブランチをフェッチする必要がある
       - name: 'Fetch'
         run: git fetch --depth 1 origin "${TARGET_BRANCH}"
-      - name: lint
+      - name: jflint
         # jflint が error を返すので pipefail しない（本当はしたい）
         # shell: bash -e -o pipefail {0}
         env:
