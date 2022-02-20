@@ -1,0 +1,20 @@
+name: lfs
+on:
+  pull_request:
+
+jobs:
+  lfs_false:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          cat ./testdata/test.bin
+
+  lfs_true:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+      - run: |
+          cat ./testdata/test.bin
