@@ -8,9 +8,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
+          git config --list > lfs_false_config.txt
           cat ./testdata/test.bin
+      - uses: actions/upload-artifact@v2
+        with:
+          name: git_config
+          path: lfs_false_config.txt
 
-  lfs_true:
+  lfs_false_true:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -18,4 +23,23 @@ jobs:
         with:
           lfs: true
       - run: |
+          git config --list > lfs_false_true_config.txt
           cat ./testdata/test.bin
+      - uses: actions/upload-artifact@v2
+        with:
+          name: git_config
+          path: lfs_false_true_config.txt
+
+  lfs_true:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+      - run: |
+          git config --list > lfs_true_config.txt
+          cat ./testdata/test.bin
+      - uses: actions/upload-artifact@v2
+        with:
+          name: git_config
+          path: lfs_true_config.txt
