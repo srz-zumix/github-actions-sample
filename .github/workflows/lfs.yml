@@ -2,6 +2,10 @@ name: lfs
 on:
   pull_request:
 
+env:
+  GIT_TRACE: 1
+
+  
 jobs:
   lfs_false:
     runs-on: ubuntu-latest
