@@ -16,18 +16,13 @@ jobs:
         credentials:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-        env:
-          # セットアップウィザードを無効
-          # disable setup wizard
-          JAVA_OPTS: -Djenkins.install.runSetupWizard=false
         ports:
           - 8080:8080
           - 50000:50000
     env:
-      JENKINS_URL: http://localhost:8080
       TARGET_BRANCH: ${{ github.base_ref }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
@@ -37,7 +32,7 @@ jobs:
         run: git fetch --depth 1 origin "${TARGET_BRANCH}"
       - uses: srz-zumix/setup-service-jenkins@main
         with:
-          id: "${{ job.services.jenkins.id }}"
+          name: jenkins
           # offical image をセットアップウィザードスキップで起動するとプラグインが空なのでインストールする
           install_suggested_plugins: true
       - name: jflint
@@ -66,10 +61,9 @@ jobs:
           - 8080:8080
           - 50000:50000
     env:
-      JENKINS_URL: http://localhost:8080
       TARGET_BRANCH: ${{ github.base_ref }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
@@ -79,7 +73,7 @@ jobs:
         run: git fetch --depth 1 origin "${TARGET_BRANCH}"
       - uses: srz-zumix/setup-service-jenkins@main
         with:
-          id: "${{ job.services.jenkins.id }}"
+          name: jenkins
       - name: jflint
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -119,7 +113,7 @@ jobs:
       TARGET_BRANCH: ${{ github.base_ref }}
     if: needs.jflint-check-secret.outputs.has == 'true'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
