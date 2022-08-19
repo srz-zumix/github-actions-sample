@@ -1,0 +1,12 @@
+name: "gh status"
+
+on:
+  pull_request:
+
+jobs:
+  gh_status:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - run: gh auth status
