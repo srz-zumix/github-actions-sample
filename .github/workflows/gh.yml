@@ -11,5 +11,5 @@ jobs:
     steps:
       - run: gh auth status
       - run: env
-      - run: cat ${$XDG_CONFIG_HOME}/gh/config.yml
-      - run: cat ${$XDG_CONFIG_HOME}/gh/hosts.yml
+      - run: cat ${XDG_CONFIG_HOME}/gh/config.yml
+      - run: cat ${XDG_CONFIG_HOME}/gh/hosts.yml
