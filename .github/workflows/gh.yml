@@ -1,4 +1,4 @@
-name: "gh status"
+name: "gh repo clone"
 
 on:
   pull_request:
