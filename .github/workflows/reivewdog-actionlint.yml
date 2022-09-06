@@ -2,6 +2,10 @@ name: actionlint
 on:
   pull_request:
 
+concurrency:
+  group: test
+  cancel-in-progress: true
+
 jobs:
   actionlint:
     runs-on: ubuntu-latest
