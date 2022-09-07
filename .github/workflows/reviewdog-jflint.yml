@@ -6,7 +6,7 @@ on:
       - '.github/workflows/reviewdog-jflint.yml'
 
 concurrency:
-  group: test
+  group: ${{ github.run_id }}
   cancel-in-progress: true
 
 jobs:
