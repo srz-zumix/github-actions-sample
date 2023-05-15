@@ -19,8 +19,8 @@ jobs:
       - id: get-repos
         run: |
             # shellcheck disable=SC2016
-            REPOS=$(gh repo list ${TARGET_OWNER} --json nameWithOwner --template '[ {{ range $i, $e := .}}{{ if ne $i 0 }}, {{ end }}"{{ $e.nameWithOwner }}"{{ end }} ]')
-            echo "::set-output name=repos::${REPOS}"
+            REPOS=$(gh repo list "${TARGET_OWNER}" --json nameWithOwner --template '[ {{ range $i, $e := .}}{{ if ne $i 0 }}, {{ end }}"{{ $e.nameWithOwner }}"{{ end }} ]')
+            echo "repos=${REPOS}" >> "${GITHUB_OUTPUT}"
       - run: echo "${{ steps.get-repos.outputs.repos }}"
 
   main:
