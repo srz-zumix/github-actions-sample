@@ -1,0 +1,33 @@
+name: Organization/Owner repo matrix
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      repos: ${{ steps.get-repos.outputs.repos }}
+    env:
+      TARGET_OWNER: srz-zumix
+    steps:
+      - id: get-repos
+        run: |
+            # shellcheck disable=SC2016
+            REPOS=$(gh repo list "${TARGET_OWNER}" --json nameWithOwner --template '[ {{ range $i, $e := .}}{{ if ne $i 0 }}, {{ end }}"{{ $e.nameWithOwner }}"{{ end }} ]')
+            echo "repos=${REPOS}" >> "${GITHUB_OUTPUT}"
+      - run: echo "${{ steps.get-repos.outputs.repos }}"
+
+  main:
+    runs-on: ubuntu-latest
+    needs: prepare
+    strategy:
+      matrix:
+        repo: "${{ fromJSON(needs.prepare.outputs.repos) }}"
+    steps:
+      - run: echo ${{ matrix.repo }} 
