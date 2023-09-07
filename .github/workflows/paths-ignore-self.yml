@@ -6,6 +6,6 @@ on:
 
 jobs:
   ignore-self-do:
-    runs-on: ubuntu-lates
+    runs-on: ubuntu-latest
     steps:
       - run: echo OK
