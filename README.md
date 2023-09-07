@@ -23,3 +23,9 @@ Matrix for all repositories under owner/organization
 ![jflint pr review](https://user-images.githubusercontent.com/1439172/152711644-fec6de69-4366-4ca9-8260-6d364664d29a.png)
 
 jflint + reviewdog examples.
+
+## paths-ignore self
+
+[paths-ignore self](.github/workflows/paths-ignore-self.yml)
+
+* Edit README only PR #17
