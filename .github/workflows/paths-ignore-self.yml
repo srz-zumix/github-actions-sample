@@ -1,0 +1,11 @@
+name: Ignore Self
+on:
+  pull_request:
+    paths-ignore:
+      - github/**
+
+jobs:
+  ignore-self-do:
+    runs-on: ubuntu-lates
+    steps:
+      - run: echo OK
