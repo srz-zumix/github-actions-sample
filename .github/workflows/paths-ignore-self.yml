@@ -2,7 +2,7 @@ name: Ignore Self
 on:
   pull_request:
     paths-ignore:
-      - github/**
+      - .github/**
 
 jobs:
   ignore-self-do:
