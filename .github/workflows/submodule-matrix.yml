@@ -14,7 +14,7 @@ jobs:
           run: |
             {
               echo '{ "include": ['
-              git submodule | sed -e 's/^-//g' | awk 'BEGIN{ ORS = "" }{print "{ \"hash\":\"" $1 "\", \"name\":\"" $2 "\" }" }'
+              git submodule | sed -e 's/^-//g' | awk 'BEGIN{ ORS = "" }{print "{ \"hash\":\"" $1 "\", \"repo\":\"" $2 "\" }" }'
               echo '] }'
             } | sed -e 's/}{/},{/g' | tee submodules.txt
             echo "submodules=$(jq -csR < submodules.txt)" >> "${GITHUB_OUTPUT}"
@@ -29,5 +29,5 @@ jobs:
         matrix: ${{ fromJson(needs.prepare.outputs.submodules) }}
       steps:
         - run: |
-            echo "${{ matrix.name }}: ${{ matrix.hash }}"
+            echo "${{ matrix.repo }}: ${{ matrix.hash }}"
   
