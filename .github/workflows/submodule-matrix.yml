@@ -17,8 +17,7 @@ jobs:
               git submodule | sed -e 's/^-//g' | awk 'BEGIN{ ORS = "" }{print "{ \"hash\":\"xxx\", \"repo\":\"" $2 "\" }" }'
               echo ']'
             } | sed -e 's/}{/},{/g' | tee submodules.txt
-            SUBMODULES=$(jq -csR < submodules.txt)
-            echo "submodules=${SUBMODULES}" >> "${GITHUB_OUTPUT}"
+            echo "submodules=$(jq -c < submodules.txt)" >> "${GITHUB_OUTPUT}"
         - name: dump
           run: |
             echo "${{ fromJson(steps.list-submodules.outputs.submodules) }}"
