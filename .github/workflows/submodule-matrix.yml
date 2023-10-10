@@ -14,7 +14,7 @@ jobs:
           run: |
             {
               echo '['
-              git submodule | sed -e 's/^-//g' | awk 'BEGIN{ ORS = "" }{print "{ \"hash\":\"xxx\", \"repo\":\"" $2 "\" }" }'
+              git submodule | sed -e 's/^-//g' | awk 'BEGIN{ ORS = "" }{print "{ \"hash\":\"" $1 "\", \"repo\":\"" $2 "\" }" }'
               echo ']'
             } | sed -e 's/}{/},{/g' | tee submodules.txt
             echo "submodules=$(jq -c < submodules.txt)" >> "${GITHUB_OUTPUT}"
