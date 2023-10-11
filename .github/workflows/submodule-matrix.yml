@@ -23,6 +23,7 @@ jobs:
             echo "${{ fromJson(steps.list-submodules.outputs.submodules) }}"
 
     submoudles-job:
+      name: submoudles-job - ${{ matrix.repo }}
       runs-on: ubuntu-latest
       needs: prepare
       strategy:
