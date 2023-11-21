@@ -3,6 +3,7 @@ on:
   pull_request:
     paths-ignore:
       - .github/**
+      - !.github/workflows/paths-ignore-self.yml
 
 jobs:
   ignore-self-do:
