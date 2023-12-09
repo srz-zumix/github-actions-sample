@@ -1,0 +1,14 @@
+name: RunIdTest
+on:
+  pull_request:
+
+jobs:
+  run_id2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: $github
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "${GITHUB_CONTEXT}"
+      - run: echo ${{ github.run_id }}
