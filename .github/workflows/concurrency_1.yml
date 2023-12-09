@@ -1,0 +1,17 @@
+name: RunIdTest
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    
+jobs:
+  concurrency_1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: $github
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "${GITHUB_CONTEXT}"
+      - run: echo ${{ github.run_id }}
