@@ -2,6 +2,10 @@
 
 GitHub Actions サンプルワークフロー
 
+## Submodule name/hash matrix
+
+[submodule-matrix](.github/workflows/submodule-matrix.yml)
+
 ## base_branch_label_cehck
 
 [base_branch_label_cehck](.github/workflows/base_branch_label_cehck.yml)

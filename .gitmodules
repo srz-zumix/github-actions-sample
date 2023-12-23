@@ -1,0 +1,6 @@
+[submodule "submodules/ci-specs"]
+	path = submodules/ci-specs
+	url = git@github.com:srz-zumix/ci-specs.git
+[submodule "submodules/gh-act"]
+	path = submodules/gh-act
+	url = git@github.com:srz-zumix/gh-act.git

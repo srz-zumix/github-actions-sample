@@ -1,0 +1,34 @@
+name: Submodule Matrix
+on:
+    pull_request:
+
+jobs:
+    prepare:
+      runs-on: ubuntu-latest
+      outputs:
+        submodules: ${{ steps.list-submodules.outputs.submodules }}
+      steps:
+        - uses: actions/checkout@v3
+        - name: List submodules
+          id: list-submodules
+          run: |
+            {
+              echo '['
+              git submodule | sed -e 's/^-//g' | awk 'BEGIN{ ORS = "" }{print "{ \"hash\":\"" $1 "\", \"repo\":\"" $2 "\" }" }'
+              echo ']'
+            } | sed -e 's/}{/},{/g' | tee submodules.txt
+            echo "submodules=$(jq -c < submodules.txt)" >> "${GITHUB_OUTPUT}"
+        - name: dump
+          run: |
+            echo "${{ fromJson(steps.list-submodules.outputs.submodules) }}"
+
+    submoudles-job:
+      name: submoudles-job - ${{ matrix.repo }}
+      runs-on: ubuntu-latest
+      needs: prepare
+      strategy:
+        matrix:
+            include: "${{ fromJson(needs.prepare.outputs.submodules) }}"
+      steps:
+        - run: |
+            echo "${{ matrix.repo }}: ${{ matrix.hash }}"
