@@ -9,4 +9,4 @@ jobs:
   ignore-self-do:
     runs-on: ubuntu-latest
     steps:
-      - run: echo OK
+      - run: whoami
