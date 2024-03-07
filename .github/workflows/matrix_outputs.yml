@@ -1,0 +1,32 @@
+name: Matrix outputs
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    outputs:
+      repos: ${{ steps.dump.outputs.test }}
+    strategy:
+      matrix:
+        test:
+          - a
+          - b
+          - c
+    steps:
+      - id: dump
+        run: echo ${{ matrix.test }}
+
+  post:
+    needs: main
+    runs-on: ubuntu-latest
+    steps:
+      - name: job api response
+        run: |
+          gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}/jobs | jq
