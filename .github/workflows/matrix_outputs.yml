@@ -21,7 +21,7 @@ jobs:
           - c
     steps:
       - id: dump
-        run: echo ${{ matrix.test }} >> "${GITHUB_OUTPUT}"
+        run: echo "test=${{ matrix.test }} ">> "${GITHUB_OUTPUT}"
 
   post:
     needs: main
