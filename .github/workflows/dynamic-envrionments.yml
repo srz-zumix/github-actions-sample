@@ -22,7 +22,7 @@ jobs:
     needs: prepare
     runs-on: ubuntu-latest
     environment:
-      name: ${{ fromJson(needs.prepare.outputs.ENVIRONMENT_NAME) }}
+      name: ${{ needs.prepare.outputs.ENVIRONMENT_NAME }}
     steps:
       - run: |
           echo "Running on ${{ needs.prepare.outputs.ENVIRONMENT_NAME }}"
