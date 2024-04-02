@@ -1,0 +1,29 @@
+name: Dynamic envrionment
+on:
+  pull_request:
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      ENVIRONMENT_NAME: ${{ steps.name.outputs.env }}
+    steps:
+      - id: name
+        run: |
+          # Randomly select a condition
+          condition=$(( RANDOM % 2 ))
+          if [[ $condition -eq 0 ]]; then
+            echo "env=test1" >> "${GITHUB_OUTPUT}"
+          else
+            echo "env=test2" >> "${GITHUB_OUTPUT}"
+          fi
+
+  dynamic-environments:
+    needs: prepare
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ fromJson(needs.prepare.outputs.ENVIRONMENT_NAME) }}
+    steps:
+      - run: |
+          echo "Running on ${{ needs.prepare.outputs.ENVIRONMENT_NAME }}"
+          echo "${{ vars.COMMENT }}"
