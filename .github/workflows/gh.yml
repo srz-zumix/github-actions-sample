@@ -1,0 +1,18 @@
+name: "gh repo clone"
+
+on:
+  pull_request:
+
+jobs:
+  gh_status:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_PAT }}
+    steps:
+      - run: gh auth status
+      - run: env
+      - run: cat "${XDG_CONFIG_HOME}/gh/config.yml" || true
+      - run: cat "${XDG_CONFIG_HOME}/gh/hosts.yml" || true
+      - run: |
+          gh repo clone https://github.com/srz-zumix/git-tips.git || true
+          gh repo clone srz-zumix/git-tips
