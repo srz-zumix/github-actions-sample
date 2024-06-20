@@ -5,6 +5,9 @@ on:
       - '**/*Jenkinsfile'
       - '.github/workflows/reviewdog-jflint.yml'
 
+concurrency:
+  group: ${{ github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   jflint-official:
