@@ -1,4 +1,4 @@
-name: reviewdog
+name: working-directory
 on:
   pull_request:
 
@@ -10,7 +10,7 @@ defaults:
     working-directory: ./.github
     
 jobs:
-  working-directory:
+  dump:
     runs-on: ubuntu-latest
     defaults:
       run:
