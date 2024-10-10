@@ -1,0 +1,22 @@
+name: reviewdog
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: ./.github
+    
+jobs:
+  working-directory:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./.github/workflows
+    steps:
+      - uses: actions/checkout@v4
+      - run: pwd
+      - run: pwd
+        working-directory: ./.github
