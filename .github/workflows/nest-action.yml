@@ -1,4 +1,6 @@
-name: Nest action
+# Composite: Step Outputs are not available when in nested composite actions
+# https://github.com/actions/runner/issues/2009
+name: Composite Step Outputs are not available when in nested composite actions
 on:
   pull_request:
 
