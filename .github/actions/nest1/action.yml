@@ -9,7 +9,8 @@ inputs:
 runs:
   using: composite
   steps:
-    - id: test
+    - shell: bash
+      id: test
       run: |
         echo "test=${{ inputs.test }}${{ inputs.text }}" >> "${GITHUB_OUTPUT}"
     - uses: ./.github/actions/nest2
