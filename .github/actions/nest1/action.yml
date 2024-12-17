@@ -1,0 +1,15 @@
+name: Nest2
+description: Nest 2
+
+inputs:
+  test:
+    description: 'Test input'
+    default: 'default'
+
+runs:
+  using: composite
+  steps:
+    - uses: srz-zumix/pos-run-action@v2
+      with:
+        post-run: |
+          echo "test=${{ inputs.test }}"

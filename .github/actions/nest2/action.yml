@@ -1,0 +1,14 @@
+name: Nest1
+description: Nest 1
+
+inputs:
+  test:
+    description: 'Test input'
+    default: 'default'
+
+runs:
+  using: composite
+  steps:
+    - uses: ./.github/actions/nest2
+      with:
+        test: ${{ inputs.test }}
