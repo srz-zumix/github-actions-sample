@@ -11,13 +11,13 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: srz-zumix/post-run-action@v2
-      with:
-        post-run: |
-          echo "test=${{ inputs.test }}"
     - id: lock-key
       shell: bash
       run: echo "key=lock-test-${{ inputs.hoge }}" | tee -a "${GITHUB_OUTPUT}"
+    - uses: srz-zumix/post-run-action@v2
+      with:
+        post-run: |
+          echo "test=${{ steps.lock-key.outputs.key }}"
     - uses: suzuki-shunsuke/lock-action@latest
       with:
         mode: check
