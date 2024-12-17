@@ -9,6 +9,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: ./.github/actions/nest2
+    - uses: srz-zumix/post-run-action@v2
       with:
-        test: ${{ inputs.test }}
+        post-run: |
+          echo "test=${{ inputs.test }}"
