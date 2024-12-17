@@ -5,14 +5,37 @@ inputs:
   test:
     description: 'Test input'
     default: 'default'
+  hoge:
+    default: 'hoge'
 
 runs:
-  using: composite
+  using: 'composite'
   steps:
-    - shell: bash
-      id: test
-      run: |
-        echo "test=${{ inputs.test }}-${{ inputs.text }}" >> "${GITHUB_OUTPUT}"
-    - uses: ./.github/actions/nest2
+    - id: lock-key
+      shell: bash
+      run: echo "key=lock-test-${{ inputs.hoge }}" | tee -a "${GITHUB_OUTPUT}"
+    - uses: srz-zumix/post-run-action@v2
       with:
-        test: ${{ steps.test.outputs.test }}
+        post-run: |
+          echo "key=${{ steps.lock-key.outputs.key }}"
+          echo "test=${{ inputs.test }}"
+    - uses: suzuki-shunsuke/lock-action@latest
+      with:
+        mode: check
+        key: ${{ steps.lock-key.outputs.key }}
+        max_wait_seconds: 600
+        wait_interval_seconds: 10
+    - uses: suzuki-shunsuke/lock-action@latest
+      with:
+        mode: lock
+        key: ${{ steps.lock-key.outputs.key }}
+    - name: sleep
+      shell: bash
+      run: sleep 30
+    - name: Echo
+      shell: bash
+      run: echo ok
+    - uses: suzuki-shunsuke/lock-action@latest
+      with:
+        mode: unlock
+        key: ${{ steps.lock-key.outputs.key }}
