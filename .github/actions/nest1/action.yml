@@ -5,15 +5,13 @@ inputs:
   test:
     description: 'Test input'
     default: 'default'
-  hoge:
-    default: '${{ github.run_id }}'
 
 runs:
   using: 'composite'
   steps:
     - id: lock-key
       shell: bash
-      run: echo "key=lock-test-${{ inputs.hoge }}" | tee -a "${GITHUB_OUTPUT}"
+      run: echo "key=lock-test-${{ inputs.test }}" | tee -a "${GITHUB_OUTPUT}"
     - uses: srz-zumix/post-run-action@v2
       with:
         post-run: |

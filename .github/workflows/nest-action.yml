@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/nest2
         with:
-          test: "nest_test"
+          test: "nest_test2"
 
   nest1:
     runs-on: ubuntu-latest
@@ -23,4 +23,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/nest1
         with:
-          test: "nest_test"
+          test: "nest_test1"
