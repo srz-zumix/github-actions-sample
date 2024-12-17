@@ -1,0 +1,14 @@
+name: reusable skip workflow
+on:
+  workflow_call:
+    outputs:
+      run_id:
+        value: ${{ github.run_id }}
+  workflow_dispatch:
+
+jobs:
+  called:
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - run: lsb_release -a
