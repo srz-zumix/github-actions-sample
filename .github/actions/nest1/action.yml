@@ -6,7 +6,7 @@ inputs:
     description: 'Test input'
     default: 'default'
   hoge:
-    default: 'hoge'
+    default: '${{ github.run_id }}'
 
 runs:
   using: 'composite'
