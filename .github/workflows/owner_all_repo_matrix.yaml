@@ -30,4 +30,4 @@ jobs:
       matrix:
         repo: "${{ fromJSON(needs.prepare.outputs.repos) }}"
     steps:
-      - run: echo ${{ matrix.repo }} 
+      - run: echo ${{ matrix.repo }}

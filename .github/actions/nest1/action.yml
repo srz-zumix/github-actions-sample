@@ -9,6 +9,9 @@ inputs:
 runs:
   using: composite
   steps:
+    - id: test
+      run: |
+        echo "test=${{ inputs.test }}${{ inputs.text }}" >> "${GITHUB_OUTPUT}"
     - uses: ./.github/actions/nest2
       with:
-        test: ${{ inputs.test }}
+        test: ${{ steps.test.outputs.test }}

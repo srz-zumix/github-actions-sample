@@ -13,3 +13,8 @@ runs:
       with:
         post-run: |
           echo "test=${{ inputs.test }}"
+    - uses: suzuki-shunsuke/lock-action@latest
+      with:
+        mode: lock
+        key: ${{ inputs.test }}
+        post_unlock: "true"
