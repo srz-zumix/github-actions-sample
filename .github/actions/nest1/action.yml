@@ -1,0 +1,42 @@
+name: Nest2
+description: Nest 2
+
+inputs:
+  test:
+    description: 'Test input'
+    default: 'default'
+
+runs:
+  using: 'composite'
+  steps:
+    - id: lock-key
+      shell: bash
+      run: |
+        echo "LOCK_KEY=lock-test-${{ inputs.test }}" | tee -a "${GITHUB_ENV}"
+        echo "key=lock-test-${{ inputs.test }}" | tee -a "${GITHUB_OUTPUT}"
+    - uses: srz-zumix/post-run-action@v2
+      with:
+        post-run: |
+          echo "key=${{ steps.lock-key.outputs.key }}"
+          echo "LOCK_KEY=${{ env.LOCK_KEY }}"
+          echo "test=${{ inputs.test }}"
+    - uses: suzuki-shunsuke/lock-action@latest
+      with:
+        mode: check
+        key: ${{ env.LOCK_KEY }}
+        max_wait_seconds: 600
+        wait_interval_seconds: 10
+    - uses: suzuki-shunsuke/lock-action@latest
+      with:
+        mode: lock
+        key: ${{ env.LOCK_KEY }}
+    - name: sleep
+      shell: bash
+      run: sleep 30
+    - name: Echo
+      shell: bash
+      run: echo ok
+    - uses: suzuki-shunsuke/lock-action@latest
+      with:
+        mode: unlock
+        key: ${{ env.LOCK_KEY }}

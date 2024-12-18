@@ -1,0 +1,28 @@
+# Composite: Step Outputs are not available when in nested composite actions
+# https://github.com/actions/runner/issues/2009
+name: Composite Step Outputs are not available when in nested composite actions
+on:
+  pull_request:
+
+permissions:
+  contents: write
+
+env:
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  nest2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/nest2
+        with:
+          test: "nest_test2"
+
+  nest1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/nest1
+        with:
+          test: "nest_test1"

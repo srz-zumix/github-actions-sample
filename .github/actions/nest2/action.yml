@@ -1,0 +1,18 @@
+name: Nest2
+description: Nest 2
+
+inputs:
+  test:
+    description: 'Test input'
+    default: 'default'
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      id: test
+      run: |
+        echo "test=${{ inputs.test }}-2" >> "${GITHUB_OUTPUT}"
+    - uses: ./.github/actions/nest1
+      with:
+        test: ${{ steps.test.outputs.test }}
