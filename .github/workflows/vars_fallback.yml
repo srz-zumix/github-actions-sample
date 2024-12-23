@@ -9,8 +9,8 @@ jobs:
     steps:
     - name: Test
       env:
-        VAR_1: ${{ vars.DEFIEND_VAR   || "undefined" }}
-        VAR_2: ${{ vars.UNDEFIEND_VAR || "undefined" }}
+        VAR_1: ${{ vars.DEFIEND_VAR   || 'undefined' }}
+        VAR_2: ${{ vars.UNDEFIEND_VAR || 'undefined' }}
       run: |
         test "${VAR_1}" == "defined"
         test "${VAR_2}" == "undefined"
