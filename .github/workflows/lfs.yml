@@ -1,0 +1,49 @@
+name: lfs
+on:
+  pull_request:
+
+env:
+  GIT_TRACE: 1
+
+
+jobs:
+  lfs_false:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          # git config --list > lfs_false_config.txt
+          cat ./testdata/test.bin
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: git_config
+      #     path: lfs_false_config.txt
+
+  lfs_false_true:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+      - run: |
+          # git config --list > lfs_false_true_config.txt
+          cat ./testdata/test.bin
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: git_config
+      #     path: lfs_false_true_config.txt
+
+  lfs_true:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+      - run: |
+          # git config --list > lfs_true_config.txt
+          cat ./testdata/test.bin
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: git_config
+      #     path: lfs_true_config.txt
