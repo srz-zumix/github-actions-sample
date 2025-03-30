@@ -1,0 +1,16 @@
+
+name: Matrix reusable skip
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  test:
+    name: ${{ matrix.type }} test
+    strategy:
+      fail-fast: false
+      matrix:
+        type:
+          - A
+          - B
+    uses: ./.github/workflows/reusable_skip_workflow.yml
